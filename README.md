@@ -8,13 +8,14 @@ A complete Python implementation of the SKUNK dice game featuring mathematically
 
 1. [Game Rules](#game-rules)
 2. [Quick Start](#quick-start)
-3. [The Core Function: `skunk_turn()`](#the-core-function-skunk_turn)
-4. [Mathematical Foundation — Why the Strategy Is Optimal](#mathematical-foundation)
-5. [Bot Strategies Explained](#bot-strategies-explained)
-6. [Testing Framework — How We Prove Correctness and Optimality](#testing-framework)
-7. [Tournament Framework — Testing Bots Against Each Other](#tournament-framework)
-8. [Interview Discussion Questions](#interview-discussion-questions)
-9. [Project Structure](#project-structure)
+3. [Interactive Web Frontend](#interactive-web-frontend)
+4. [The Core Function: `skunk_turn()`](#the-core-function-skunk_turn)
+5. [Mathematical Foundation — Why the Strategy Is Optimal](#mathematical-foundation)
+6. [Bot Strategies Explained](#bot-strategies-explained)
+7. [Testing Framework — How We Prove Correctness and Optimality](#testing-framework)
+8. [Tournament Framework — Testing Bots Against Each Other](#tournament-framework)
+9. [Interview Discussion Questions](#interview-discussion-questions)
+10. [Project Structure](#project-structure)
 
 ---
 
@@ -48,6 +49,25 @@ source .venv/bin/activate
 pip install pytest
 pytest test_skunk_game.py -v
 ```
+
+---
+
+## Interactive Web Frontend
+
+This project includes a beautiful, responsive web-based visualization of the SKUNK game, complete with real-time tournament simulations, agent visualizations, and dark mode. 
+
+### View Online (GitHub Pages)
+The frontend is automatically deployed to GitHub Pages via GitHub Actions. You can view the live interactive visualization at:
+**[https://Myan17.github.io/Skunk-Game/](https://Myan17.github.io/Skunk-Game/)**
+
+### Run Locally
+To run the frontend locally on your machine:
+```bash
+# Serve the visualization directory using Python's built-in HTTP server
+cd UMFIA_project/visualization
+python3 -m http.server 8000
+```
+Then navigate to [http://localhost:8000](http://localhost:8000) in your web browser.
 
 ---
 
