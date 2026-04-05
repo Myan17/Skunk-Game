@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SKUNK Dice Game — Interactive Strategy Visualizer</title>
+    <meta name="description" content="Explore the mathematics and strategy behind the SKUNK dice game with interactive visualizations, live bot battles, and adaptive learning simulations.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- ═══ NAVIGATION ═══ -->
+    <nav id="main-nav">
+        <div class="nav-brand">
+            <span class="nav-dice">🎲</span>
+            <span class="nav-title">SKUNK</span>
+        </div>
+        <div class="nav-links">
+            <a href="#hero" class="nav-link active" data-section="hero">Home</a>
+            <a href="#rules" class="nav-link" data-section="rules">Rules</a>
+            <a href="#math" class="nav-link" data-section="math">Math</a>
+            <a href="#simulator" class="nav-link" data-section="simulator">Battle</a>
+            <a href="#adaptive" class="nav-link" data-section="adaptive">Learning</a>
+        </div>
+    </nav>
+
+    <!-- ═══ HERO SECTION ═══ -->
+    <section id="hero" class="section">
+        <div class="hero-bg">
+            <div class="floating-dice" id="floating-dice-container"></div>
+        </div>
+        <div class="hero-content">
+            <h1 class="hero-title">
+                <span class="letter" style="--i:0">S</span><span class="letter" style="--i:1">K</span><span class="letter" style="--i:2">U</span><span class="letter" style="--i:3">N</span><span class="letter" style="--i:4">K</span>
+            </h1>
+            <p class="hero-subtitle">The Dice Game of Risk & Reward</p>
+            <p class="hero-description">
+                Explore the mathematics of optimal play, watch AI bots battle in real-time,
+                and see how machine learning discovers winning strategies.
+            </p>
+            <div class="hero-stats">
+                <div class="hero-stat">
+                    <span class="stat-value" id="stat-safe">69.4%</span>
+                    <span class="stat-label">Safe Roll</span>
+                </div>
+                <div class="hero-stat">
+                    <span class="stat-value" id="stat-bust">27.8%</span>
+                    <span class="stat-label">Single 1 Bust</span>
+                </div>
+                <div class="hero-stat">
+                    <span class="stat-value" id="stat-snake">2.8%</span>
+                    <span class="stat-label">Snake Eyes 💀</span>
+                </div>
+            </div>
+            <a href="#rules" class="cta-button">
+                <span>Explore the Game</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+        </div>
+        <div class="scroll-indicator">
+            <div class="scroll-arrow"></div>
+        </div>
+    </section>
+
+    <!-- ═══ RULES SECTION ═══ -->
+    <section id="rules" class="section">
+        <div class="section-container">
+            <h2 class="section-title">How SKUNK Works</h2>
+            <p class="section-description">A deceptively simple game of push-your-luck that hides deep strategic complexity.</p>
+
+            <div class="rules-grid">
+                <div class="rule-card" id="rule-safe">
+                    <div class="rule-icon safe-icon">
+                        <div class="dice-visual" data-d1="4" data-d2="5">
+                            <div class="mini-die">4</div>
+                            <div class="mini-die">5</div>
+                        </div>
+                    </div>
+                    <h3>Safe Roll</h3>
+                    <p>Neither die shows a 1. Add the sum to your turn total. Keep rolling or bank your points!</p>
+                    <div class="rule-prob">
+                        <div class="prob-bar" style="--prob: 69.4%"></div>
+                        <span>25/36 ≈ 69.4%</span>
+                    </div>
+                </div>
+
+                <div class="rule-card" id="rule-single">
+                    <div class="rule-icon bust-icon">
+                        <div class="dice-visual" data-d1="1" data-d2="4">
+                            <div class="mini-die danger">1</div>
+                            <div class="mini-die">4</div>
+                        </div>
+                    </div>
+                    <h3>Single 1</h3>
+                    <p>One die shows a 1. You lose all points earned <em>this turn</em>, but keep your banked score.</p>
+                    <div class="rule-prob">
+                        <div class="prob-bar bust-bar" style="--prob: 27.8%"></div>
+                        <span>10/36 ≈ 27.8%</span>
+                    </div>
+                </div>
+
+                <div class="rule-card" id="rule-snake">
+                    <div class="rule-icon snake-icon">
+                        <div class="dice-visual" data-d1="1" data-d2="1">
+                            <div class="mini-die danger">1</div>
+                            <div class="mini-die danger">1</div>
+                        </div>
+                    </div>
+                    <h3>Snake Eyes 💀</h3>
+                    <p>Both dice show 1. You lose <strong>ALL</strong> accumulated points — your score resets to zero!</p>
+                    <div class="rule-prob">
+                        <div class="prob-bar snake-bar" style="--prob: 2.78%"></div>
+                        <span>1/36 ≈ 2.78%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interactive Dice Demo -->
+            <div class="dice-demo" id="dice-demo">
+                <h3>Try It Yourself</h3>
+                <div class="demo-area">
+                    <div class="demo-dice-container">
+                        <div class="demo-die" id="demo-die-1">?</div>
+                        <div class="demo-die" id="demo-die-2">?</div>
+                    </div>
+                    <div class="demo-info">
+                        <div class="demo-result" id="demo-result">Roll the dice!</div>
+                        <div class="demo-turn-total">Turn Total: <span id="demo-turn-total">0</span></div>
+                    </div>
+                    <div class="demo-buttons">
+                        <button class="btn btn-roll" id="btn-roll" onclick="rollDemoHandler()">🎲 Roll</button>
+                        <button class="btn btn-bank" id="btn-bank" onclick="bankDemoHandler()">💰 Bank</button>
+                        <button class="btn btn-reset" id="btn-reset" onclick="resetDemoHandler()">↺ Reset</button>
+                    </div>
+                    <div class="demo-banked">Banked Score: <span id="demo-banked">0</span></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ MATH / EV SECTION ═══ -->
+    <section id="math" class="section">
+        <div class="section-container">
+            <h2 class="section-title">The Mathematics of Optimal Play</h2>
+            <p class="section-description">Expected value analysis reveals exactly when to stop rolling.</p>
+
+            <div class="formula-showcase">
+                <div class="formula-card">
+                    <div class="formula-label">Expected Change from Rolling</div>
+                    <div class="formula-math">
+                        ΔE = <span class="formula-frac"><span class="num">200 − 11·T − G</span><span class="den">36</span></span>
+                    </div>
+                    <div class="formula-legend">
+                        <span><strong>T</strong> = turn total</span>
+                        <span><strong>G</strong> = game total (banked)</span>
+                    </div>
+                </div>
+                <div class="formula-card">
+                    <div class="formula-label">Optimal Stop Condition</div>
+                    <div class="formula-math stop-formula">
+                        11·T + G ≥ 200
+                    </div>
+                    <div class="formula-legend">
+                        <span>Stop when expected gain ≤ 0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interactive Heatmap -->
+            <div class="heatmap-container">
+                <h3>Expected Value Heatmap</h3>
+                <p class="heatmap-desc">Hover to explore. <span class="roll-zone">Green = Roll</span> · <span class="stop-zone">Red = Stop</span> · <span class="break-even-zone">White line = Break-even</span></p>
+                <div class="heatmap-wrapper">
+                    <canvas id="heatmap-canvas" width="600" height="400"></canvas>
+                    <div class="heatmap-tooltip" id="heatmap-tooltip"></div>
+                    <div class="heatmap-axis-y">Turn Total (T)</div>
+                    <div class="heatmap-axis-x">Game Total (G)</div>
+                </div>
+            </div>
+
+            <!-- Threshold Table -->
+            <div class="threshold-table-wrapper">
+                <h3>Optimal Turn Threshold by Game Total</h3>
+                <table class="threshold-table" id="threshold-table">
+                    <thead>
+                        <tr>
+                            <th>Game Total</th>
+                            <th>EV Threshold</th>
+                            <th>Interpretation</th>
+                            <th>Visual</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ SIMULATOR / BATTLE SECTION ═══ -->
+    <section id="simulator" class="section">
+        <div class="section-container">
+            <h2 class="section-title">Bot Battle Arena</h2>
+            <p class="section-description">Watch AI strategies compete in real-time. Which one dominates?</p>
+
+            <div class="battle-controls">
+                <div class="bot-selector">
+                    <h4>Select Bots</h4>
+                    <div class="bot-checkboxes" id="bot-checkboxes">
+                        <label class="bot-check"><input type="checkbox" value="conservative-12" checked><span class="bot-tag conservative">Conservative(12)</span></label>
+                        <label class="bot-check"><input type="checkbox" value="conservative-18" checked><span class="bot-tag conservative">Conservative(18)</span></label>
+                        <label class="bot-check"><input type="checkbox" value="aggressive-28" checked><span class="bot-tag aggressive">Aggressive(28)</span></label>
+                        <label class="bot-check"><input type="checkbox" value="ev"><span class="bot-tag ev">ExpectedValue</span></label>
+                        <label class="bot-check"><input type="checkbox" value="context" checked><span class="bot-tag context">ContextAware</span></label>
+                        <label class="bot-check"><input type="checkbox" value="fixed-3"><span class="bot-tag fixed">FixedRoll(3)</span></label>
+                        <label class="bot-check"><input type="checkbox" value="random-65"><span class="bot-tag random">Random(65%)</span></label>
+                    </div>
+                </div>
+                <div class="battle-settings">
+                    <div class="setting">
+                        <label for="target-score">Target Score</label>
+                        <input type="number" id="target-score" value="100" min="10" max="500">
+                    </div>
+                    <div class="setting">
+                        <label for="num-games">Number of Games</label>
+                        <input type="number" id="num-games" value="2000" min="100" max="50000" step="100">
+                    </div>
+                    <div class="setting">
+                        <label for="sim-speed">Speed</label>
+                        <select id="sim-speed">
+                            <option value="0">Instant</option>
+                            <option value="1" selected>Fast</option>
+                            <option value="10">Slow (Watch)</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn btn-battle" id="btn-battle" onclick="startBattle()">
+                    ⚔️ Start Battle
+                </button>
+            </div>
+
+            <!-- Live Results -->
+            <div class="battle-results" id="battle-results" style="display:none;">
+                <div class="live-progress">
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" id="battle-progress"></div>
+                    </div>
+                    <span class="progress-text" id="progress-text">0%</span>
+                </div>
+
+                <div class="results-charts">
+                    <div class="chart-panel">
+                        <h4>Win Rate Over Time</h4>
+                        <canvas id="winrate-chart" width="700" height="350"></canvas>
+                    </div>
+                    <div class="chart-panel">
+                        <h4>Final Standings</h4>
+                        <div class="standings" id="standings"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ ADAPTIVE LEARNING SECTION ═══ -->
+    <section id="adaptive" class="section">
+        <div class="section-container">
+            <h2 class="section-title">Self-Improving AI</h2>
+            <p class="section-description">Watch a bot evolve its strategy through trial and error.</p>
+
+            <div class="adaptive-explanation">
+                <div class="explain-card">
+                    <div class="explain-icon">🧬</div>
+                    <h4>Risk Factor</h4>
+                    <p>The Adaptive Bot scales the EV threshold by a <em>risk factor</em>. Higher = more aggressive, lower = more conservative.</p>
+                </div>
+                <div class="explain-card">
+                    <div class="explain-icon">🏆</div>
+                    <h4>Win → Reinforce</h4>
+                    <p>After a win, the bot makes a small random perturbation around its current risk factor, reinforcing what works.</p>
+                </div>
+                <div class="explain-card">
+                    <div class="explain-icon">🔍</div>
+                    <h4>Loss → Explore</h4>
+                    <p>After a loss, the bot explores with a larger perturbation, with a slight pull toward the best known risk factor.</p>
+                </div>
+            </div>
+
+            <div class="adaptive-controls">
+                <div class="setting">
+                    <label for="adapt-initial-risk">Initial Risk Factor</label>
+                    <input type="number" id="adapt-initial-risk" value="1.0" min="0.3" max="2.5" step="0.1">
+                </div>
+                <div class="setting">
+                    <label for="adapt-learning-rate">Learning Rate</label>
+                    <input type="number" id="adapt-learning-rate" value="0.08" min="0.01" max="0.3" step="0.01">
+                </div>
+                <div class="setting">
+                    <label for="adapt-games">Games to Play</label>
+                    <input type="number" id="adapt-games" value="3000" min="500" max="20000" step="500">
+                </div>
+                <div class="setting">
+                    <label for="adapt-opponent">Opponent</label>
+                    <select id="adapt-opponent">
+                        <option value="ev">ExpectedValue</option>
+                        <option value="conservative-15">Conservative(15)</option>
+                        <option value="aggressive-28">Aggressive(28)</option>
+                        <option value="context" selected>ContextAware</option>
+                    </select>
+                </div>
+                <button class="btn btn-adaptive" id="btn-adaptive" onclick="startAdaptive()">
+                    🧠 Start Learning
+                </button>
+            </div>
+
+            <div class="adaptive-results" id="adaptive-results" style="display:none;">
+                <div class="adaptive-charts">
+                    <div class="chart-panel">
+                        <h4>Risk Factor Evolution</h4>
+                        <canvas id="risk-chart" width="700" height="300"></canvas>
+                    </div>
+                    <div class="chart-panel">
+                        <h4>Rolling Win Rate</h4>
+                        <canvas id="adaptive-winrate-chart" width="700" height="300"></canvas>
+                    </div>
+                </div>
+                <div class="adaptive-summary" id="adaptive-summary"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ FOOTER ═══ -->
+    <footer>
+        <div class="footer-content">
+            <p>SKUNK Dice Game Visualizer · Built with pure HTML, CSS & JavaScript</p>
+            <p class="footer-math">Break-even: 11·T + G = 200 · P(safe) = 25/36 · E[safe sum] = 8</p>
+        </div>
+    </footer>
+
+    <script src="engine.js"></script>
+    <script src="charts.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
