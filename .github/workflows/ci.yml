@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch: {}
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Tests + tournament
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install
+        run: pip install pytest pytest-cov
+
+      - name: Test
+        run: >-
+          pytest -q
+          --cov=skunk_game --cov=benchmarks
+          --cov-report=term-missing --cov-fail-under=70
+
+      - name: Tournament
+        run: python benchmarks/tournament.py --json tournament.json
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: tournament
+          path: tournament.json

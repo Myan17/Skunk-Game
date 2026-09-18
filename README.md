@@ -1,6 +1,14 @@
 # SKUNK Dice Game — Strategy, Simulation & Interactive Analysis
 
-Welcome to a complete engineering and mathematical breakdown of the classic dice game "SKUNK." This project features a mathematically proven set of AI bots, automated tournament simulators, and a self-improving algorithm that successfully teaches itself how to beat its opponents over time. It has been built with an emphasis on code quality, testing reliability, and mathematical rigor.
+[![CI](https://github.com/Myan17/Skunk-Game/actions/workflows/ci.yml/badge.svg)](https://github.com/Myan17/Skunk-Game/actions/workflows/ci.yml)
+
+A strategy and simulation study of the push-your-luck dice game "SKUNK": a
+derived expected-value stopping rule, a roster of competing bots, a seeded
+tournament harness with confidence intervals, a self-adjusting bot, and an
+interactive browser dashboard. **88 tests · measured win rates in
+[Results](#measured-results).**
+
+**Live dashboard:** https://myan17.github.io/Skunk-Game/
 
 ---
 
@@ -96,6 +104,48 @@ A robust frontend built from scratch using HTML5 Canvas, modern CSS, and vanilla
 
 ---
 
+## Measured results
+
+```bash
+python benchmarks/tournament.py          # ~2 s
+```
+
+First, the stopping rule. Rolling is worth `(25/36)·8` in expectation and risks
+`(10/36)·T + (1/36)·(T+G)`, so on expected points you should stop once
+**`11·T + G ≥ 200`**. The harness re-derives this by simulation over 50,000
+trials and confirms the formula at every sampled game total.
+
+But that rule maximises *expected points per turn*, which is a different
+objective from *winning a race to 100*. Round robin, 4,000 games per pairing,
+seats alternated so neither bot moves first more often, seed 17:
+
+| Bot | Overall win rate | 95% CI |
+|---|---|---|
+| **ContextAware** | **61.5%** | [60.9%, 62.2%] |
+| ExpectedValue | 57.6% | [56.9%, 58.2%] |
+| Conservative(15) | 56.3% | [55.6%, 57.0%] |
+| FixedRoll(3) | 55.7% | [55.0%, 56.4%] |
+| Aggressive(30) | 48.9% | [48.2%, 49.6%] |
+| Random(60%) | 20.1% | [19.5%, 20.6%] |
+
+ExpectedValue head to head:
+
+| vs | EV win rate | 95% CI | Verdict |
+|---|---|---|---|
+| Random(60%) | 81.5% | [80.2%, 82.6%] | wins |
+| Aggressive(30) | 56.8% | [55.3%, 58.3%] | wins |
+| Conservative(15) | 51.5% | [50.0%, 53.1%] | no significant difference |
+| FixedRoll(3) | 51.5% | [50.0%, 53.0%] | no significant difference |
+| ContextAware | 46.5% | [44.9%, 48.0%] | **loses** |
+
+What the numbers say: the points-optimal rule is **not** the win-optimal
+strategy. It cannot be distinguished from a plain "stop at 15" threshold, and it
+loses to a bot that reads the scoreboard. That is the gap between optimising an
+expectation and optimising a probability of winning.
+
+`test_tournament.py` pins this ordering, so a strategy change that breaks
+it fails CI.
+
 ## Professional Interview Summary
 
 *This section addresses core engineering and mathematical logic questions regarding the principles behind this project.*
@@ -106,7 +156,7 @@ A robust frontend built from scratch using HTML5 Canvas, modern CSS, and vanilla
 
 If your goal is to cleanly **maximize the points you receive on an isolated turn**, you must rely strictly on probability and expected value. According to statistical modeling, the mathematically optimal moment to stop rolling is dictated by a specific threshold formula. You should roll the dice only when `11 × (current turn points) + (total banked points) < 200`. Before passing this threshold, another roll will statistically net you higher rewards than what you risk losing. Our internal `ExpectedValueBot` abides ruthlessly by this mathematical rule.
 
-However, if your goal is to actually **win the game against human or AI opponents**, you must embrace context-awareness rather than pure math. A strict statistical bot might play it incredibly safe, while the opponent next to them is only five points away from victory. Our `ContextAwareBot` evaluates the dynamic reality of the game state—drastically amplifying its aggressiveness if it is losing (risky catch-up) and tightening its conservatism if it is comfortably winning (lead protection). Through simulating over 10,000 algorithmic matchups, this Context-Aware strategy repeatedly dominated mathematically strict bots. 
+However, if your goal is to actually **win the game against human or AI opponents**, you must embrace context-awareness rather than pure math. A strict statistical bot might play it incredibly safe, while the opponent next to them is only five points away from victory. Our `ContextAwareBot` evaluates the dynamic reality of the game state—drastically amplifying its aggressiveness if it is losing (risky catch-up) and tightening its conservatism if it is comfortably winning (lead protection). In the seeded round robin under [Measured results](#measured-results), ContextAware beats the ExpectedValue bot head to head **53.5% to 46.5%** over 4,000 games — a modest edge, but one whose 95% interval excludes an even split. 
 
 ### 2. Does the risk preference of your algorithm matter and should it be consistent throughout the rounds of play?
 
@@ -152,7 +202,7 @@ While the exact equations driving the logic can become highly complex, understan
 2. **Aggressive Bot:** Deeply risk-tolerant. Aims for huge point totals but regularly bankrupts itself with risky dice combinations. 
 3. **Expected Value Bot (Level 1 Optimum):** Operates purely on the `(200 - Game Total) / 11` probability threshold formula. Clinically precise, but ignores its opponents. 
 4. **Context Aware Bot (Level 2 Optimum):** Adjusts the mathematical formula on the fly depending on what human or bot opponents are currently doing with their scores. This is the top-performing intelligence in the suite.
-5. **Monte Carlo Bot (Simulation Engine):** Refuses to predict. Instead, before making any decision, it runs 500 imaginary futures in a fraction of a second and chooses the action that worked best on average.
+5. **Monte Carlo Bot (Simulation Engine):** Refuses to predict. Instead, before making any decision, it runs 200 imaginary futures (configurable) in a fraction of a second and chooses the action that worked best on average.
 6. **Adaptive Bot (Machine Learning):** Starts with basic instructions but rewrites its own code regarding risk tolerance based entirely on whether it lost or won its last game. 
 
 ---
